@@ -93,16 +93,22 @@ tables = driver.find_elements(By.CSS_SELECTOR, "table[style*='width: 445px']")
 
 filtered_tables = []
 
+print("days_range = ", days_range)
 for day in days_range:
     try:
-        headers = driver.find_elements(By.XPATH, f"//h3[contains(translate(., 'СВЯДН', 'свядн'), '{day.lower()}')]")
+        # формируем XPath-фильтр через OR
+        # conditions = " or ".join([f"contains(translate(., 'СЕГОДНЯВЧЕРА', 'сегоднявчера'), '{d.lower()}')" for d in days_range])
+        conditions = " or ".join([f"contains(translate(., 'СЕГОДНЯВЧЕРА', 'сегоднявчера'), '{d.lower()}')" for d in days_range])
+
+        xpath_expr = f"//h3[{conditions}]"
+
+        headers = driver.find_elements(By.XPATH, xpath_expr)
 
         for header in headers:
             try:
-                # ищем таблицу внутри того же td, где и <h3>
-                parent_td = header.find_element(By.XPATH, "./ancestor::td[1]")
-                table = parent_td.find_element(By.XPATH, ".//table[contains(@style, 'width: 445px')]")
-                filtered_tables.append(table)
+                links = driver.find_elements(By.XPATH,"//h3[contains(translate(., 'СЕГОДНЯ', 'сегодня'), 'сегодня')]/ancestor::tr/following-sibling::tr/td//a[@class='showTip newmesslist']")
+                print(links)
+                filtered_tables.append(links)
                 print(f"📦 Найдена таблица для '{day}'")
             except Exception as e:
                 print(f"⚠️ Не удалось найти таблицу для '{day}': {e}")

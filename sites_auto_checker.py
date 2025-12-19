@@ -96,7 +96,6 @@ for i, value in enumerate(values, start=1):
     # Проверка на блокировку ресурса
     wait = WebDriverWait(driver, 20)
     page_source = driver.page_source.lower()
-    print("page_source = ", page_source)
 
     if blocked_text.lower() in page_source:
         try:
