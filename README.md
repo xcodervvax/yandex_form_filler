@@ -41,3 +41,13 @@
   "pause_seconds": 30
 }
 ```
+
+Добавил venv зависимости
+```bash
+pip3 freeze > requirements.txt
+```
+
+Для восстановления необходимо ввести команду
+```bash
+pip3 install -r requirements.txt
+```
