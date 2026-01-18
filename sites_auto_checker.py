@@ -22,7 +22,9 @@ driver = webdriver.Chrome()
 wait = WebDriverWait(driver, 20)
 
 print(f"🌐 Загружаю сайт: {url}")
+
 driver.get(url)
+
 wait.until(EC.presence_of_element_located((By.TAG_NAME, "body")))
 print("✅ Страница загружена")
 
@@ -113,6 +115,46 @@ for i, value in enumerate(values, start=1):
         time.sleep(pause_seconds)
     else:
         print("✅ Ресурс не заблокирован")
+
+    # === 4. Физическая проверка сайта для индексов 2, 5, 8 ===
+    check_indexes = [2, 5, 8, 10, 12, 14, 15]  # индексы (нумерация начинается с 1)
+
+    if i in check_indexes:
+        check_value = value.strip()
+        if not check_value.startswith("http"):
+            check_value = "https://" + check_value
+
+        print(f"\n🌐 Выполняю физическую проверку сайта (индекс {i}): {check_value}")
+
+        try:
+            driver.get(check_value)
+            wait.until(EC.presence_of_element_located((By.TAG_NAME, "body")))
+            time.sleep(6)
+            page_text = driver.page_source.lower()
+
+            # Список типичных ошибок
+            error_signatures = [
+                "404 not found",
+                "page not found",
+                "ошибка 404",
+                "forbidden",
+                "доступ запрещен",
+                "error 403",
+                "ошибка сервера",
+                "<title>404",
+            ]
+
+            # Проверка на типичные ошибки
+            if any(err in page_text for err in error_signatures):
+                print(f"❌ Сайт {check_value} недоступен или вернул ошибку.")
+                # Сохраняем скриншот для отчёта
+                screenshot_path = f"screens/unavailable_{i}_{int(time.time())}.png"
+                driver.save_screenshot(screenshot_path)
+                print(f"📸 Скриншот сохранён: {screenshot_path}")
+            else:
+                print(f"✅ Сайт {check_value} успешно открылся и доступен.")
+        except Exception as e:
+            print(f"⚠ Ошибка при проверке сайта {check_value}: {e}")
 
     # Возврат на главную страницу
     driver.get(url)

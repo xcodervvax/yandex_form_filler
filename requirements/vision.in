@@ -1,0 +1,4 @@
+-r base.in
+torch
+opencv-contrib-python
+pytesseract

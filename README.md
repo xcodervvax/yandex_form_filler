@@ -41,13 +41,41 @@
   "pause_seconds": 30
 }
 ```
-
-Добавил venv зависимости
+Для создания виртуального окружения:
 ```bash
-pip3 freeze > requirements.txt
+python3 -m venv venv
 ```
 
-Для восстановления необходимо ввести команду
+Генерация lock-файлов:
 ```bash
-pip3 install -r requirements.txt
+pip3 install pip-tools
+
+pip-compile requirements/base.in
+pip-compile requirements/api.in
+pip-compile requirements/vision.in
+```
+
+получаешь чистые *.txt с зафиксированными версиями
+
+Для восстановления необходимо ввести команду, если мы хотим только что-то отдельное:
+```bash
+pip3 install -r requirements/api.txt
+pip3 install -r requirements/vision.txt
+
+pip3 install -r requirements/api.txt -r requirements/vision.txt
+```
+
+Как добавлять новую зависимость (правильно). Пример: добавил httpx в API. Открыл api.in, добавить
+```bash
+httpx
+```
+после этого выполнить
+```bash
+pip-compile requirements/api.in
+```
+
+А если временно ставил пакет в venv?
+```bash
+pip3 install some-lib
+pip3 uninstall some-lib   # если не нужен
 ```
