@@ -3,30 +3,32 @@
 ```json
 {
   "url": "https://eais.rkn.gov.ru/",
+  "spam_hause_url": "https://check.spamhaus.org/",
   "fields": [
     {
       "selector": ".inputMsg",
       "values": [
-        "intimcity.today",
-        "m.intimcity.today",
-        "https://b.intimcity.today",
-        "https://intimcity.lat",
-        "https://m.intimcity.lat",
-        "https://b.intimcity.lat/",
-        "intimstory.lol",
-        "m.intimstory.lol",
-        "https://p.intimstory.lol/",
-        "https://intimcity1.top/",
-        "https://btb.intimcity1.top/",
-        "https://intimstory.cfd/",
+        "intimcity.bike",
+        "m.intimcity.bike",
+        "https://b.intimcity.bike",
+        "intimcity.cyou",
+        "m.intimcity.cyou",
+        "https://a.intimcity.cyou/",
+        "intimstory.gold",
+        "https://m.intimstory.gold",
+        "https://a.intimstory.gold/",
+        "intimcity4.top",
+        "https://bta.intimcity4.top/",
+        "https://intimstory.cfd",
         "https://btfon.intimstory.cfd/",
         "https://io.intim-city.site/",
-        "https://pr.intimcity.lat/",
-        "https://btpr.intimcity1.top/"
+        "https://pr.intimcity.bike/",
+        "https://btpr.intimcity4.top/"
       ]
     }
   ],
   "submit": "input[type='submit']",
+  "submit_spam_hause": ".transition-colors.duration-300.text-sm.rounded-full.font-medium.py-1.px-4.inline-flex.gap-2.items-center.focus-visible:outline-none.focus-visible:ring-sky-400.focus-visible:ring-4.align-middle.text-grey-7.bg-grey-5.cursor-default.justify-center.text-center.w-full.mt-5.h-14.font-semibold.text-xl",
   "blocked_text": "орган, принявший решение о внесении в реестр",
   "pause_seconds": 8
 }

@@ -4,6 +4,9 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 import time
 import requests
+from datetime import datetime
+
+RUN_TIME = datetime.now().strftime("%H%M%S")
 
 driver = webdriver.Chrome()
 
@@ -20,7 +23,8 @@ for i in range(100):
 
     response = requests.get(src)
 
-    with open(f"images/img_{i+1}.jpg", "wb") as f:
+    filename = f"images/img_{RUN_TIME}_{i+1:03d}.jpg"
+    with open(filename, "wb") as f:
         f.write(response.content)
 
     time.sleep(4)
