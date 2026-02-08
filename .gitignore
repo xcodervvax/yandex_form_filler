@@ -7,3 +7,17 @@ announcement.json
 data.json
 
 images/*
+
+ocr/__pycache__/*
+*.py[cod]
+
+# Torch / training artifacts
+*.pt
+*.pth
+*.onnx
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS
+.DS_Store

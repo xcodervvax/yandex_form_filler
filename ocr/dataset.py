@@ -9,6 +9,15 @@ class CaptchaDataset(Dataset):
         self.images = list(Path(root).glob("*.jpg"))
         self.transform = T.Compose([
             T.Grayscale(),
+
+            # CROP: (top, left, height, width)
+            T.Lambda(lambda img: img.crop((
+                20,        # left
+                12,        # top
+                200 - 20,  # right
+                73 - 12    # bottom
+            ))),
+
             T.Resize((32, 128)),
             T.ToTensor(),
         ])
