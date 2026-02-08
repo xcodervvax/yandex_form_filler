@@ -1,11 +1,11 @@
 from dataset import CaptchaDataset
+import matplotlib.pyplot as plt
 
 ds = CaptchaDataset("data/train")
-
-print("Dataset size:", len(ds))
-
 img, label = ds[0]
 
-print("Image shape:", img.shape)
-print("Label:", label)
-print("Image min/max:", img.min().item(), img.max().item())
+plt.imshow(img.squeeze(0), cmap="gray")
+plt.title(label)
+plt.axis("off")
+plt.savefig("debug_sample.png", dpi=400, bbox_inches="tight")
+print("Saved to debug_sample.png")

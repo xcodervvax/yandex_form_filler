@@ -12,13 +12,13 @@ class CaptchaDataset(Dataset):
 
             # CROP: (top, left, height, width)
             T.Lambda(lambda img: img.crop((
-                20,        # left
-                12,        # top
-                200 - 20,  # right
-                73 - 12    # bottom
+                25,        # left
+                16,        # top
+                200 - 25,  # right
+                73 - 16    # bottom
             ))),
 
-            T.Resize((32, 128)),
+            # T.Resize((32, 128)),
             T.ToTensor(),
         ])
 
