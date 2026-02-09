@@ -1,4 +1,4 @@
-ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_"
 
 # CTC: 0 зарезервирован под blank
 char2idx = {char: idx + 1 for idx, char in enumerate(ALPHABET)}

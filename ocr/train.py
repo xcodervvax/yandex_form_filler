@@ -69,7 +69,7 @@ def main():
 
     model.train()
 
-    for epoch in range(10):
+    for epoch in range(30):
         total_loss = 0.0
 
         for images, targets, target_lengths, _ in loader:
