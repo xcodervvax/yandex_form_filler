@@ -9,7 +9,7 @@ from selenium.webdriver.support import expected_conditions as EC
 with open("data.json", "r", encoding="utf-8") as f:
     config = json.load(f)
 
-url = config["url"]
+url = config["rkn_feedback_url"]
 field = config["fields"][0]
 selector = field["selector"]
 values = field["values"]

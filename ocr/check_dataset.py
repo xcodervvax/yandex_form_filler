@@ -1,7 +1,7 @@
 from dataset import CaptchaDataset
 import matplotlib.pyplot as plt
 
-ds = CaptchaDataset("data/train")
+ds = CaptchaDataset("data/train", "data/train/labels.txt")
 img, label = ds[0]
 
 plt.imshow(img.squeeze(0), cmap="gray")

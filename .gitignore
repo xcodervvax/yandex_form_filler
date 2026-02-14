@@ -1,8 +1,7 @@
 venv/*
 
-screens/*
-
 announcement.json
+process.log
 
 data.json
 
@@ -23,3 +22,7 @@ ocr/__pycache__/*
 .DS_Store
 
 ocr/data/*
+
+RKN/images/*
+RKN/RKN.json
+RKN/screens/*

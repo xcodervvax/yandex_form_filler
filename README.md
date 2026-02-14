@@ -3,27 +3,28 @@
 ```json
 {
   "url": "https://eais.rkn.gov.ru/",
+  "rkn_feedback_url": "https://eais.rkn.gov.ru/",
   "spam_hause_url": "https://check.spamhaus.org/",
   "fields": [
     {
       "selector": ".inputMsg",
       "values": [
-        "intimcity.bike",
-        "m.intimcity.bike",
-        "https://b.intimcity.bike",
+        "intimcity.man",
+        "m.intimcity.man",
+        "https://a.intimcity.man",
         "intimcity.cyou",
         "m.intimcity.cyou",
         "https://a.intimcity.cyou/",
         "intimstory.gold",
         "https://m.intimstory.gold",
         "https://a.intimstory.gold/",
-        "intimcity4.top",
-        "https://bta.intimcity4.top/",
+        "intimcity5.top",
+        "https://bt.intimcity5.top/",
         "https://intimstory.cfd",
         "https://btfon.intimstory.cfd/",
         "https://io.intim-city.site/",
         "https://pr.intimcity.bike/",
-        "https://btpr.intimcity4.top/"
+        "https://btpr.intimcity5.top/"
       ]
     }
   ],
@@ -95,3 +96,11 @@ pip-compile requirements/api.in
 pip3 install some-lib
 pip3 uninstall some-lib   # если не нужен
 ```
+
+По OCR
+Для тренировки модели нужно скачать файлы в папку data/train необходимые файлы.
+Предположим, они сохраняются в таком формате img_000830_001.jpg
+Внутри нужно создать файл labels.txt, в котором будут прописываться соответсвия
+имени файла и его значения, то есть GT (Ground Truth) - Правильный, эталонный текст,
+который должен быть на изображении. На выходе получаем PR (Prediction) - Текст,
+который предсказала модель OCR
