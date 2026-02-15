@@ -96,6 +96,9 @@ pip-compile requirements/api.in
 pip3 install some-lib
 pip3 uninstall some-lib   # если не нужен
 ```
+По этой сылке скачиваем необходимый хромдрайвер
+https://sites.google.com/chromium.org/driver/downloads?authuser=0
+и кладём его в корень проекта
 
 По OCR
 Для тренировки модели нужно скачать файлы в папку data/train необходимые файлы.

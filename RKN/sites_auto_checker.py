@@ -4,6 +4,8 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
 
 # === 1. Загрузка конфигурации ===
 with open("data.json", "r", encoding="utf-8") as f:
@@ -18,7 +20,17 @@ blocked_text = config.get("blocked_text", "Орган, принявший реш
 pause_seconds = config.get("pause_seconds", 15)
 
 # === 2. Настройка Selenium ===
-driver = webdriver.Chrome()
+options = Options()
+options.binary_location = "/snap/bin/chromium"
+options.add_argument("--no-sandbox")
+options.add_argument("--disable-dev-shm-usage")
+options.add_argument("--disable-gpu")
+options.add_argument("--disable-quic")
+options.add_argument("--disable-ipv6")
+options.add_argument("--remote-debugging-port=9222")
+
+service = Service('../chromedriver')
+driver = webdriver.Chrome(service=service, options=options)
 wait = WebDriverWait(driver, 20)
 
 print(f"🌐 Загружаю сайт: {url}")
