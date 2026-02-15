@@ -3,7 +3,7 @@
 ```json
 {
   "url": "https://eais.rkn.gov.ru/",
-  "rkn_feedback_url": "https://eais.rkn.gov.ru/",
+  "rkn_feedback_url": "https://eais.rkn.gov.ru/feedback/",
   "spam_hause_url": "https://check.spamhaus.org/",
   "fields": [
     {
