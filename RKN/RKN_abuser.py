@@ -87,7 +87,6 @@ for i, value in enumerate(values, start=1):
     except Exception as e:
         print("Ошибка при вводе ссылки: {e}")
 
-    
     try:
         raw_value = value["image"]
         raw_value = unicodedata.normalize("NFC", raw_value.strip())
@@ -128,4 +127,20 @@ for i, value in enumerate(values, start=1):
 
     except Exception as e:
         print(f"Ошибка при загрузке изображения: {e}")
+
+    # Ждём первый чекбокс
+    checkbox_2 = WebDriverWait(driver, 10).until(
+        EC.element_to_be_clickable((By.CSS_SELECTOR, 'input[name="MediaTypeU[]"][value="2"]'))
+    )
+    if not checkbox_2.is_selected():
+        checkbox_2.click()
+        print("Чекбокс value=2 выбран")
+
+    # Ждём второй чекбокс
+    checkbox_4 = WebDriverWait(driver, 10).until(
+        EC.element_to_be_clickable((By.CSS_SELECTOR, 'input[name="MediaTypeU[]"][value="4"]'))
+    )
+    if not checkbox_4.is_selected():
+        checkbox_4.click()
+        print("Чекбокс value=4 выбран")
 # driver.quit()
