@@ -8,7 +8,7 @@ def find_image_by_domain(images_dir: str, domain: str) -> str:
         name, ext = os.path.splitext(filename)
 
         if name == domain:
-            return os.path.join(images_dir, filename)
+            return os.path.join(filename)
 
     return ''
 

@@ -3,6 +3,7 @@ import time
 import subprocess
 import sys
 import os
+import unicodedata
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -88,38 +89,43 @@ for i, value in enumerate(values, start=1):
 
     
     try:
-        image_name = value["image"]
+        raw_value = value["image"]
+        raw_value = unicodedata.normalize("NFC", raw_value.strip())
 
         current_dir = os.path.dirname(os.path.abspath(__file__))
         images_dir = os.path.join(current_dir, "images")
 
-        # Возможные расширения
-        possible_extensions = [".jpg", ".jpeg", ".png", ".webp"]
-
-        image_path = None
-
-        if os.path.splitext(image_name)[1]:
-            full_path = os.path.join(images_dir, image_name)
-
-            if os.path.exists(full_path):
-                image_path = full_path
+        # Если это URL — берём домен
+        if raw_value.startswith("http://") or raw_value.startswith("https://"):
+            parsed = urlparse(raw_value)
+            image_name = parsed.netloc.replace("www.", "")
+            # поиск файла с любым расширением
+            image_path = None
+            for filename in os.listdir(images_dir):
+                name_without_ext, ext = os.path.splitext(filename)
+                if name_without_ext == image_name:
+                    image_path = os.path.join(images_dir, filename)
+                    break
         else:
-            for ext in possible_extensions:
-                full_path = os.path.join(images_dir, image_name + ext)
-
-                if os.path.exists(full_path):
-                    image_path = full_path
+            image_name = raw_value
+            image_path = None
+            for filename in os.listdir(images_dir):
+                clean_filename = unicodedata.normalize("NFC", filename.strip())
+                if clean_filename == image_name:
+                    image_path = os.path.join(images_dir, filename)
                     break
 
         if not image_path:
-            print(f"Файл не найден: {image_name}")
+            print("Файл не найден:", image_name)
+            print("Файлы в папке:", os.listdir(images_dir))
         else:
-            file_input = wait.until(
-            EC.presence_of_element_located((By.ID, "screenShot"))
+            print("Найден файл:", image_path)
+            file_input = WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.ID, "screenShot"))
             )
-
             file_input.send_keys(image_path)
-            print(f"Загружено изображение: {image_name}")
+            print("Изображение успешно загружено.")
+
     except Exception as e:
         print(f"Ошибка при загрузке изображения: {e}")
 # driver.quit()
