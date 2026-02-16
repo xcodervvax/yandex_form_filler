@@ -4,6 +4,7 @@ import subprocess
 import sys
 import os
 import unicodedata
+import random
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -30,6 +31,7 @@ with open("data.json", "r", encoding="utf-8") as f:
     config = json.load(f)
 
 url = config["rkn_feedback_url"]
+submit_selector = config["submit"]
 
 # === 1a. Загрузка конфигурации  RKN.json ===
 with open("RKN.json", "r", encoding="utf-8") as f:
@@ -58,12 +60,13 @@ print(f"🌐 Загружаю сайт: {url}")
 driver.get(url)
 
 wait.until(EC.presence_of_element_located((By.TAG_NAME, "body")))
-print("✅ Страница загружена")
+print("Страница загружена")
 
 # === 3. Цикл по ссылкам ===
 for i, value in enumerate(values, start=1):
-    print(f"\n🔹 Проверяю ссылку {i}/{len(values)}: {value}")
+    # print(f"\n🔹 Проверяю ссылку {i}/{len(values)}: {value}")
 
+    # type
     try:
         sex = wait.until(
             EC.presence_of_element_located((By.ID, "Type"))
@@ -74,8 +77,7 @@ for i, value in enumerate(values, start=1):
     except Exception as e:
         print("Ошибка при выборе типа информации: {e}")
 
-    print(value)
-
+    # url
     try:
         link = wait.until(
             EC.presence_of_element_located((By.ID, "ResourceUrl"))
@@ -87,6 +89,7 @@ for i, value in enumerate(values, start=1):
     except Exception as e:
         print("Ошибка при вводе ссылки: {e}")
 
+    # image
     try:
         raw_value = value["image"]
         raw_value = unicodedata.normalize("NFC", raw_value.strip())
@@ -123,24 +126,199 @@ for i, value in enumerate(values, start=1):
                 EC.presence_of_element_located((By.ID, "screenShot"))
             )
             file_input.send_keys(image_path)
-            print("Изображение успешно загружено.")
 
     except Exception as e:
         print(f"Ошибка при загрузке изображения: {e}")
 
-    # Ждём первый чекбокс
     checkbox_2 = WebDriverWait(driver, 10).until(
         EC.element_to_be_clickable((By.CSS_SELECTOR, 'input[name="MediaTypeU[]"][value="2"]'))
     )
     if not checkbox_2.is_selected():
         checkbox_2.click()
-        print("Чекбокс value=2 выбран")
 
-    # Ждём второй чекбокс
     checkbox_4 = WebDriverWait(driver, 10).until(
         EC.element_to_be_clickable((By.CSS_SELECTOR, 'input[name="MediaTypeU[]"][value="4"]'))
     )
     if not checkbox_4.is_selected():
         checkbox_4.click()
-        print("Чекбокс value=4 выбран")
-# driver.quit()
+
+    # info
+    textarea = WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.NAME, "CommentU"))
+    )
+
+    comment_text = value["info"]
+    textarea.clear()
+    textarea.send_keys(comment_text)
+
+    # surname
+    try:
+        rln = wait.until(
+            EC.presence_of_element_located((By.ID, "ReporterLastName"))
+        )
+
+        rln.clear()
+        rln_val = value["surname"]
+        rln.send_keys(rln_val)
+    except Exception as e:
+        print("Ошибка при вводе surname: {e}")
+
+    # first_name
+    try:
+        rfn = wait.until(
+            EC.presence_of_element_located((By.ID, "ReporterFirstName"))
+        )
+
+        rfn.clear()
+        rfn_val = value["first_name"]
+        rfn.send_keys(rfn_val)
+    except Exception as e:
+        print("Ошибка при вводе first_name: {e}")
+
+    # patronimic
+    try:
+        patronimic = wait.until(
+            EC.presence_of_element_located((By.ID, "ReporterMiddleName"))
+        )
+
+        patronimic.clear()
+        patronimic_val = value["patronimic"]
+        patronimic.send_keys(patronimic_val)
+    except Exception as e:
+        print("Ошибка при вводе patronimic: {e}")
+        
+    # born_year
+    try:
+        born_year = wait.until(
+            EC.presence_of_element_located((By.ID, "ReporterBirthYear"))
+        )
+
+        born_year.clear()
+        born_year_val = value["born_year"]
+        born_year.send_keys(born_year_val)
+    except Exception as e:
+        print("Ошибка при вводе born_year: {e}")
+
+    # work_place
+    try:
+        work_place = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located(
+                (By.CSS_SELECTOR, 'input.inputMsg[name="ReporterOrg"]')
+            )
+        )
+
+        work_text = value["work_place"]
+        work_place.clear()
+        work_place.send_keys(work_text)
+    except Exception as e:
+        print("Ошибка при вводе work_place: {e}")
+
+    # country
+    try:
+        country_input = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located(
+                (By.CSS_SELECTOR, 'input.inputMsg[name="ReporterCountry"]')
+            )
+        )
+
+        county_text = value["country"]
+        country_input.clear()
+        country_input.send_keys(county_text)
+    except Exception as e:
+        print("Ошибка при вводе country: {e}")
+
+    # region
+    try:
+        region_input = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located(
+                (By.CSS_SELECTOR, 'input.inputMsg[name="ReporterRegion"]')
+            )
+        )
+
+        region_text = value["region"]
+        region_input.clear()
+        region_input.send_keys(region_text)
+    except Exception as e:
+        print("Ошибка при вводе region: {e}")
+
+    # email
+    try:
+        email_input = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located(
+                (By.CSS_SELECTOR, 'input.inputMsg[name="ReporterEmail"]')
+            )
+        )
+
+        email_text = value["email"]
+        email_input.clear()
+        email_input.send_keys(email_text)
+    except Exception as e:
+        print("Ошибка при вводе email: {e}")
+
+    # check email
+    send_notification_cb = WebDriverWait(driver, 10).until(
+        EC.element_to_be_clickable((By.CSS_SELECTOR, 'input[type="checkbox"][name="SendNotification"][value="true"]'))
+    )
+
+    # Если ещё не выбран — кликаем
+    if not send_notification_cb.is_selected():
+        send_notification_cb.click()
+
+    # === Блок капчи ===
+    while True:
+        print("🧩 Введи капчу вручную (или подожди, скрипт проверит через 6 сек).")
+        time.sleep(6)
+
+        try:
+            # Найти инпут капчи (по name, id или типу — подстрой при необходимости)
+            captcha_inputs = driver.find_elements(By.CSS_SELECTOR, "input[type='text'], input[name*='captcha'], input[id*='captcha']")
+            captcha_value = ""
+            for inp in captcha_inputs:
+                v = inp.get_attribute("value")
+                if v and len(v.strip()) == 6:
+                    captcha_value = v.strip()
+                    break
+
+            if captcha_value:
+                print(f"🤖 Обнаружен ввод капчи ({captcha_value}) → автоотправка")
+                button = driver.find_element(By.CSS_SELECTOR, submit_selector)
+                button.click()
+                print("🚀 Кнопка отправки нажата автоматически")
+            else:
+                input("⏸ Капча не заполнена. Введи вручную и нажми Enter → ")
+                button = driver.find_element(By.CSS_SELECTOR, submit_selector)
+                button.click()
+                print("🚀 Кнопка нажата вручную")
+
+        except Exception as e:
+            print(f"⚠ Ошибка при обработке капчи: {e}")
+            continue
+
+        time.sleep(3)
+
+        # Проверка на неверный защитный код
+        try:
+            modal = driver.find_element(By.ID, "divMsgModal")
+            modal_text = modal.text.strip().lower()
+            if "неверно указан защитный код" in modal_text:
+                print("⚠ Неверно введён код. Повторите ввод капчи.")
+                try:
+                    close_btn = modal.find_element(By.XPATH, ".//button | .//input[@value='Закрыть']")
+                    close_btn.click()
+                except:
+                    driver.execute_script("document.getElementById('divMsgModal').style.display='none';")
+                time.sleep(1)
+                continue  # Повторяем попытку
+        except:
+            pass
+
+        break  # Всё успешно — выходим из while
+
+    # Небольшая задержка для загрузки результатов
+    time.sleep(5)
+
+    # Возврат на главную страницу
+    driver.get(url)
+
+print("\n🎯 Скрипт отработал успешно.")
+driver.quit()

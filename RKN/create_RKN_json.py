@@ -35,22 +35,24 @@ def parse_file(input_filename, images_dir='images'):
             link = ''
             image_path = ''
 
-        info_match = re.search(r'info:\s*(.+)', block, re.IGNORECASE | re.DOTALL)
+        info_match = re.search(r'info:\s*(.+)\=', block, re.IGNORECASE | re.DOTALL)
         info = info_match.group(1).strip() if info_match else ''
         surname_match = re.search(r'surname:\s*([^\n]+)', block, re.IGNORECASE | re.DOTALL)
-        surname = surname_match.group(1).strip() if info_match else ''
-        name_match = re.search(r'name:\s*([^\n]+)', block, re.IGNORECASE | re.DOTALL)
-        name = surname_match.group(1).strip() if info_match else ''
+        surname = surname_match.group(1).strip() if surname_match else ''
+        first_name_match = re.search(r'first_name:\s*([^\n]+)', block, re.IGNORECASE | re.DOTALL)
+        first_name = first_name_match.group(1).strip() if first_name_match else ''
         patronimic_match = re.search(r'patronimic:\s*([^\n]+)', block, re.IGNORECASE | re.DOTALL)
-        patronimic = patronimic_match.group(1).strip() if info_match else ''
+        patronimic = patronimic_match.group(1).strip() if patronimic_match else ''
         born_year_match = re.search(r'born_year:\s*([^\n]+)', block, re.IGNORECASE | re.DOTALL)
-        born_year = born_year_match.group(1).strip() if info_match else ''
+        born_year = born_year_match.group(1).strip() if born_year_match else ''
         work_place_match = re.search(r'work_place:\s*([^\n]+)', block, re.IGNORECASE | re.DOTALL)
-        work_place = work_place_match.group(1).strip() if info_match else ''
+        work_place = work_place_match.group(1).strip() if work_place_match else ''
         country_match = re.search(r'country:\s*([^\n]+)', block, re.IGNORECASE | re.DOTALL)
-        country = country_match.group(1).strip() if info_match else ''
+        country = country_match.group(1).strip() if country_match else ''
         region_match = re.search(r'region:\s*([^\n]+)', block, re.IGNORECASE | re.DOTALL)
-        region = region_match.group(1).strip() if info_match else ''
+        region = region_match.group(1).strip() if region_match else ''
+        email_match = re.search(r'email:\s*([^\n]+)', block, re.IGNORECASE | re.DOTALL)
+        email = email_match.group(1).strip() if email_match else ''
 
         # Создаем словарь для записи
         record = {
@@ -58,12 +60,13 @@ def parse_file(input_filename, images_dir='images'):
             'info': info,
             'image': image_path,
             'surname': surname,
-            'name': name,
+            'first_name': first_name,
             'patronimic': patronimic,
             'born_year': born_year,
             'work_place': work_place,
             'country': country,
-            'region': region
+            'region': region,
+            'email': email
         }
         records.append(record)
 
