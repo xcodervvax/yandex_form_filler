@@ -1,13 +1,16 @@
 import json
 import re
+import os
+from urllib.parse import urlparse
 
-# Функция для очистки ссылки и получения имени файла
-def get_image_name(link):
-    # Удаляем протокол (http:// или https://)
-    link = re.sub(r'^https?://', '', link)
-    # Убираем слэш в конце, если есть
-    link = link.rstrip('/')
-    return link
+def find_image_by_domain(images_dir: str, domain: str) -> str:
+    for filename in os.listdir(images_dir):
+        name, ext = os.path.splitext(filename)
+
+        if name == domain:
+            return os.path.join(images_dir, filename)
+
+    return ''
 
 # Основная функция
 def parse_file(input_filename, images_dir='images'):
@@ -24,8 +27,10 @@ def parse_file(input_filename, images_dir='images'):
 
         if link_match:
             link = link_match.group(1).strip()
-            image_name = get_image_name(link)
-            image_path = f"{images_dir}/{image_name}"
+            parsed = urlparse(link)
+            domain = parsed.netloc
+
+            image_path = find_image_by_domain(images_dir, domain)
         else:
             link = ''
             image_path = ''

@@ -12,17 +12,17 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.support.ui import Select
 
 # === 0. Запуск create_RKN_json.py ===
-# current_dir = os.path.dirname(os.path.abspath(__file__))
-# script_path = os.path.join(current_dir, "create_RKN_json.py")
+current_dir = os.path.dirname(os.path.abspath(__file__))
+script_path = os.path.join(current_dir, "create_RKN_json.py")
 
-# print("Запускаю create_RKN_json.py ...")
-# result = subprocess.run([sys.executable, script_path])
+print("Запускаю create_RKN_json.py ...")
+result = subprocess.run([sys.executable, script_path])
 
-# if result.returncode != 0:
-#     print("ошибка при выполнении create_RKN_json.py")
-#     sys.exit(1)
+if result.returncode != 0:
+    print("ошибка при выполнении create_RKN_json.py")
+    sys.exit(1)
 
-# print("create_RKN_json.py успешно выполнен")
+print("create_RKN_json.py успешно выполнен")
 
 # === 1. Загрузка конфигурации  data.json ===
 with open("data.json", "r", encoding="utf-8") as f:
@@ -39,6 +39,7 @@ pause_seconds = config.get("pause_seconds", 15)
 # === 2. Настройка Selenium ===
 options = Options()
 options.binary_location = "/snap/bin/chromium"
+# options.binary_location = "/snap/bin/yandex-browser"
 options.add_argument("--no-sandbox")
 options.add_argument("--disable-dev-shm-usage")
 options.add_argument("--disable-gpu")
@@ -83,6 +84,42 @@ for i, value in enumerate(values, start=1):
         link_val = value["link"]
         link.send_keys(link_val)
     except Exception as e:
-        print("ошибка при вводе ссылки: {e}")
+        print("Ошибка при вводе ссылки: {e}")
 
+    
+    try:
+        image_name = value["image"]
+
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        images_dir = os.path.join(current_dir, "images")
+
+        # Возможные расширения
+        possible_extensions = [".jpg", ".jpeg", ".png", ".webp"]
+
+        image_path = None
+
+        if os.path.splitext(image_name)[1]:
+            full_path = os.path.join(images_dir, image_name)
+
+            if os.path.exists(full_path):
+                image_path = full_path
+        else:
+            for ext in possible_extensions:
+                full_path = os.path.join(images_dir, image_name + ext)
+
+                if os.path.exists(full_path):
+                    image_path = full_path
+                    break
+
+        if not image_path:
+            print(f"Файл не найден: {image_name}")
+        else:
+            file_input = wait.until(
+            EC.presence_of_element_located((By.ID, "screenShot"))
+            )
+
+            file_input.send_keys(image_path)
+            print(f"Загружено изображение: {image_name}")
+    except Exception as e:
+        print(f"Ошибка при загрузке изображения: {e}")
 # driver.quit()
