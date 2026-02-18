@@ -266,56 +266,41 @@ for i, value in enumerate(values, start=1):
 
     # === Блок капчи ===
     while True:
-        print("🧩 Введи капчу вручную (или подожди, скрипт проверит через 6 сек).")
-        time.sleep(6)
+        input("Введи капчу и нажми Submit в браузере. Потом нажми Enter → ")
 
+        # Ждём реакцию страницы
         try:
-            # Найти инпут капчи (по name, id или типу — подстрой при необходимости)
-            captcha_inputs = driver.find_elements(By.CSS_SELECTOR, "input[type='text'], input[name*='captcha'], input[id*='captcha']")
-            captcha_value = ""
-            for inp in captcha_inputs:
-                v = inp.get_attribute("value")
-                if v and len(v.strip()) == 6:
-                    captcha_value = v.strip()
-                    break
-
-            if captcha_value:
-                print(f"🤖 Обнаружен ввод капчи ({captcha_value}) → автоотправка")
-                button = driver.find_element(By.CSS_SELECTOR, submit_selector)
-                button.click()
-                print("🚀 Кнопка отправки нажата автоматически")
-            else:
-                input("⏸ Капча не заполнена. Введи вручную и нажми Enter → ")
-                button = driver.find_element(By.CSS_SELECTOR, submit_selector)
-                button.click()
-                print("🚀 Кнопка нажата вручную")
-
-        except Exception as e:
-            print(f"⚠ Ошибка при обработке капчи: {e}")
+            WebDriverWait(driver, 5).until(
+                lambda d: d.current_url != url or
+                d.find_elements(By.ID, "divMsgModal")
+            )
+        except:
+            print("⚠ Нет ответа от страницы")
             continue
 
-        time.sleep(3)
+        # Если редирект — успех
+        if driver.current_url != url:
+            print("✅ Форма отправлена успешно")
+            break
 
-        # Проверка на неверный защитный код
+        # Проверяем модалку
         try:
             modal = driver.find_element(By.ID, "divMsgModal")
-            modal_text = modal.text.strip().lower()
-            if "неверно указан защитный код" in modal_text:
-                print("⚠ Неверно введён код. Повторите ввод капчи.")
-                try:
-                    close_btn = modal.find_element(By.XPATH, ".//button | .//input[@value='Закрыть']")
-                    close_btn.click()
-                except:
-                    driver.execute_script("document.getElementById('divMsgModal').style.display='none';")
-                time.sleep(1)
-                continue  # Повторяем попытку
-        except:
-            pass
+            modal_text = modal.text.lower()
 
-        break  # Всё успешно — выходим из while
+            if "неверно указан защитный код" in modal_text:
+                print("❌ Неверная капча, пробуй снова")
+                continue
+
+            if "ваше сообщение отправлено" in modal_text or "спасибо" in modal_text:
+                print("✅ Успешная отправка")
+                break
+        except:
+            print("⚠ Не удалось определить статус")
+            continue
 
     # Небольшая задержка для загрузки результатов
-    time.sleep(5)
+    time.sleep(2)
 
     # Возврат на главную страницу
     driver.get(url)

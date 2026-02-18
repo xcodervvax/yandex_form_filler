@@ -11,7 +11,7 @@
       "values": [
         "intimcity.man",
         "m.intimcity.man",
-        "https://a.intimcity.man",
+        "https://b.intimcity.man",
         "intimcity.cyou",
         "m.intimcity.cyou",
         "https://a.intimcity.cyou/",
