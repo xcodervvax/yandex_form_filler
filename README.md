@@ -14,22 +14,22 @@
         "https://b.intimcity.man",
         "intimcity.cyou",
         "m.intimcity.cyou",
-        "https://a.intimcity.cyou/",
+        "https://a.intimcity.cyou",
         "intimstory.gold",
         "https://m.intimstory.gold",
-        "https://a.intimstory.gold/",
+        "https://b.intimstory.gold",
         "intimcity5.top",
-        "https://bt.intimcity5.top/",
+        "https://bt.intimcity5.top",
         "https://intimstory.cfd",
-        "https://btfon.intimstory.cfd/",
-        "https://io.intim-city.site/",
-        "https://pr.intimcity.bike/",
-        "https://btpr.intimcity5.top/"
+        "https://btfon.intimstory.cfd",
+        "https://io.intim-city.site",
+        "https://pr.intimcity.bike",
+        "https://btpr.intimcity5.top"
       ]
     }
   ],
   "submit": "input[type='submit']",
-  "submit_spam_hause": ".transition-colors.duration-300.text-sm.rounded-full.font-medium.py-1.px-4.inline-flex.gap-2.items-center.focus-visible:outline-none.focus-visible:ring-sky-400.focus-visible:ring-4.align-middle.text-grey-7.bg-grey-5.cursor-default.justify-center.text-center.w-full.mt-5.h-14.font-semibold.text-xl",
+  "input_spam_hause": "input[data-placeholder*='IP']",
   "blocked_text": "орган, принявший решение о внесении в реестр",
   "pause_seconds": 8
 }

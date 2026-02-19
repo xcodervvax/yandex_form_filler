@@ -266,11 +266,34 @@ for i, value in enumerate(values, start=1):
 
     # === Блок капчи ===
     while True:
-        input("Введи капчу и нажми Submit в браузере. Потом нажми Enter → ")
-
-        # Ждём реакцию страницы
         try:
-            WebDriverWait(driver, 5).until(
+        # ищем поле капчи
+        captcha_input = WebDriverWait(driver, 60).until(
+            EC.presence_of_element_located(
+                (By.CSS_SELECTOR, "input[type='text'][maxlength='6'], input[name*='captcha'], input[id*='captcha']")
+            )
+        )
+
+        # ждём пока пользователь введёт 6 символов
+        WebDriverWait(driver, 10).until(
+            lambda d: len(captcha_input.get_attribute("value").strip()) == 6
+        )
+
+        print("🧩 Капча заполнена. Отправляем форму...")
+
+        # ждём пока кнопка станет кликабельной
+        button = WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable((By.CSS_SELECTOR, submit_selector))
+        )
+        button.click()
+
+        except Exception as e:
+            print("⚠ Ошибка при работе с капчей:", e)
+            continue
+
+        # Ждём результат отправки
+        try:
+            WebDriverWait(driver, 10).until(
                 lambda d: d.current_url != url or
                 d.find_elements(By.ID, "divMsgModal")
             )
@@ -278,26 +301,28 @@ for i, value in enumerate(values, start=1):
             print("⚠ Нет ответа от страницы")
             continue
 
-        # Если редирект — успех
-        if driver.current_url != url:
-            print("✅ Форма отправлена успешно")
+    # Если редирект — успех
+    if driver.current_url != url:
+        print("✅ Успешный редирект")
+        break
+
+    # Проверка модалки
+    try:
+        modal = driver.find_element(By.ID, "divMsgModal")
+        modal_text = modal.text.lower()
+
+        if "неверно указан защитный код" in modal_text:
+            print("❌ Неверная капча. Ждём повторного ввода.")
+            captcha_input.clear()
+            continue
+
+        if "успешно" in modal_text or "принято" in modal_text:
+            print("✅ Форма успешно отправлена")
             break
 
-        # Проверяем модалку
-        try:
-            modal = driver.find_element(By.ID, "divMsgModal")
-            modal_text = modal.text.lower()
-
-            if "неверно указан защитный код" in modal_text:
-                print("❌ Неверная капча, пробуй снова")
-                continue
-
-            if "ваше сообщение отправлено" in modal_text or "спасибо" in modal_text:
-                print("✅ Успешная отправка")
-                break
-        except:
-            print("⚠ Не удалось определить статус")
-            continue
+    except:
+        print("⚠ Статус не определён")
+        continue
 
     # Небольшая задержка для загрузки результатов
     time.sleep(2)

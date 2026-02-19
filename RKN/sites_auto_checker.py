@@ -115,7 +115,7 @@ for i, value in enumerate(values, start=1):
         try:
             # Найти элемент с текстом блокировки
             element = driver.find_element(By.XPATH, f"//*[contains(translate(., 'ОРГАНПРИНЯВШИЙРЕШЕНИЕОВНЕСЕНИИ', 'органпринявшийрешениеовнесении'), '{blocked_text.lower()}')]")
-            screenshot_path = f"RKN/screens/blocked_{i}_{int(time.time())}.png"
+            screenshot_path = f"screens/blocked_{i}_{int(time.time())}.png"
             element.screenshot(screenshot_path)
             print(f"📸 Сохранён фрагмент страницы: {screenshot_path}")
         except Exception as e:
