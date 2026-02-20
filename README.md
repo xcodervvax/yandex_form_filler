@@ -9,22 +9,22 @@
     {
       "selector": ".inputMsg",
       "values": [
-        "intimcity.man",
-        "m.intimcity.man",
-        "https://b.intimcity.man",
+        "intimcity.mba",
+        "m.intimcity.mba",
+        "https://a.intimcity.mba",
         "intimcity.cyou",
         "m.intimcity.cyou",
         "https://a.intimcity.cyou",
-        "intimstory.gold",
-        "https://m.intimstory.gold",
-        "https://b.intimstory.gold",
-        "intimcity5.top",
-        "https://bt.intimcity5.top",
+        "intimstory.guru",
+        "https://m.intimstory.guru",
+        "https://b.intimstory.guru",
+        "intimcity6.top",
+        "https://bt.intimcity6.top",
         "https://intimstory.cfd",
         "https://btfon.intimstory.cfd",
         "https://io.intim-city.site",
         "https://pr.intimcity.bike",
-        "https://btpr.intimcity5.top"
+        "https://btpr.intimcity6.top"
       ]
     }
   ],

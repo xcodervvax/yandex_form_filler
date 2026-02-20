@@ -1,14 +1,26 @@
 import os
 import requests
-from selenium import webdriver
-from selenium.webdriver.common.by import By
 import time
 import requests
 from datetime import datetime
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
 
 RUN_TIME = datetime.now().strftime("%H%M%S")
 
-driver = webdriver.Chrome()
+options = Options()
+options.binary_location = "/snap/bin/chromium"
+options.add_argument("--no-sandbox")
+options.add_argument("--disable-dev-shm-usage")
+options.add_argument("--disable-gpu")
+options.add_argument("--disable-quic")
+options.add_argument("--disable-ipv6")
+options.add_argument("--remote-debugging-port=9222")
+
+service = Service('./chromedriver')
+driver = webdriver.Chrome(service=service, options=options)
 
 os.makedirs("images", exist_ok=True)
 
