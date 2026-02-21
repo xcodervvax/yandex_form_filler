@@ -12,6 +12,10 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.support.ui import Select
+from selenium.common.exceptions import (
+    TimeoutException,
+    StaleElementReferenceException,
+)
 
 # === 0. Запуск create_RKN_json.py ===
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -265,57 +269,70 @@ for i, value in enumerate(values, start=1):
         send_notification_cb.click()
 
     # === Блок капчи ===
-    while True:
+    for attempt in range(1, 4):
+        print(f"\n🔁 Попытка {attempt}/3")
+
         try:
-            # ищем поле капчи
-            captcha_input = WebDriverWait(driver, 60).until(
+            # 1️⃣ Ищем поле капчи
+            captcha_input = WebDriverWait(driver, 20).until(
                 EC.presence_of_element_located(
-                    (By.CSS_SELECTOR, "input[type='text'][maxlength='6'], input[name*='captcha'], input[id*='captcha']")
+                    (By.CSS_SELECTOR,
+                    "input[type='text'][maxlength='6'], "
+                    "input[name*='captcha'], "
+                    "input[id*='captcha']")
                 )
             )
 
-            # ждём пока пользователь введёт 6 символов
-            WebDriverWait(driver, 10).until(
-                lambda d: len(captcha_input.get_attribute("value").strip()) == 6
+            # 2️⃣ Ждём ввода 6 символов
+            WebDriverWait(driver, 300).until(
+                lambda d: len(
+                    captcha_input.get_attribute("value").strip()
+                ) == 6
             )
 
             print("🧩 Капча заполнена. Отправляем форму...")
 
-            # ждём пока кнопка станет кликабельной
+            # 3️⃣ Сохраняем старый текст модалки
+            old_modal_text = ""
+            try:
+                old_modal_text = driver.find_element(By.ID, "divMsgModal").text
+            except:
+                pass
+
+            # 4️⃣ Ждём кнопку и кликаем
             button = WebDriverWait(driver, 10).until(
                 EC.element_to_be_clickable((By.CSS_SELECTOR, submit_selector))
             )
 
             button.click()
 
-            time.sleep(3)
-
-        except Exception as e:
-            print("⚠ Ошибка при работе с капчей:", e)
-            # continue
-
-        # Ждём результат отправки
-        try:
-            WebDriverWait(driver, 10).until(
-                lambda d: d.current_url != url or
-                d.find_elements(By.ID, "divMsgModal")
+            # 5️⃣ Ждём результат
+            WebDriverWait(driver, 15).until(
+                lambda d: (
+                    d.current_url != url
+                    or (
+                        len(d.find_elements(By.ID, "divMsgModal")) > 0
+                        and d.find_element(By.ID, "divMsgModal").text != old_modal_text
+                    )
+                )
             )
-        except:
-            print("⚠ Нет ответа от страницы")
-            # continue
 
-        # Если редирект — успех
+        except (TimeoutException, StaleElementReferenceException) as e:
+            print("⚠ Ошибка ожидания:", e)
+            continue
+
+        # === Проверка редиректа ===
         if driver.current_url != url:
             print("✅ Успешный редирект")
             break
 
-        # Проверка модалки
+        # === Анализ модалки ===
         try:
             modal = driver.find_element(By.ID, "divMsgModal")
             modal_text = modal.text.lower()
 
             if "неверно указан защитный код" in modal_text:
-                print("❌ Неверная капча. Ждём повторного ввода.")
+                print("❌ Неверная капча. Ожидаем новый ввод.")
                 captcha_input.clear()
                 continue
 
@@ -323,9 +340,14 @@ for i, value in enumerate(values, start=1):
                 print("✅ Форма успешно отправлена")
                 break
 
-        except:
-            print("⚠ Статус не определён")
+            print("⚠ Неизвестный ответ:", modal_text)
+
+        except Exception as e:
+            print("⚠ Ошибка анализа модалки:", e)
             continue
+
+    else:
+        print("⛔ Попытки исчерпаны (3/3).")
 
     # Небольшая задержка для загрузки результатов
     time.sleep(2)

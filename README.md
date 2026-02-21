@@ -11,20 +11,20 @@
       "values": [
         "intimcity.mba",
         "m.intimcity.mba",
-        "https://a.intimcity.mba",
+        "b.intimcity.mba",
         "intimcity.cyou",
         "m.intimcity.cyou",
-        "https://a.intimcity.cyou",
+        "a.intimcity.cyou",
         "intimstory.guru",
-        "https://m.intimstory.guru",
-        "https://b.intimstory.guru",
+        "m.intimstory.guru",
+        "b.intimstory.guru",
         "intimcity6.top",
-        "https://bt.intimcity6.top",
-        "https://intimstory.cfd",
-        "https://btfon.intimstory.cfd",
-        "https://io.intim-city.site",
-        "https://pr.intimcity.bike",
-        "https://btpr.intimcity6.top"
+        "bt.intimcity6.top",
+        "intimstory.cfd",
+        "btfon.intimstory.cfd",
+        "io.intim-city.site",
+        "pr.intimcity.bike",
+        "btpr.intimcity6.top"
       ]
     }
   ],

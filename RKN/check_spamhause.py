@@ -28,14 +28,14 @@ with SB(uc=True, headless=False, incognito=True) as sb:
             sb.clear(selector)
             sb.type(selector, value)
             print(f"➡️ Введено: {value}")
-            time.sleep(3)
+            time.sleep(2)
 
             # Нажимаем ENTER вместо кнопки
             sb.send_keys(selector, "\n")
 
             # Ждём результат
             sb.wait_for_ready_state_complete()
-            time.sleep(3)
+            time.sleep(2)
 
             page_text = sb.get_text("body").lower()
 
@@ -47,7 +47,7 @@ with SB(uc=True, headless=False, incognito=True) as sb:
                 sb.save_screenshot(screenshot_path)
                 print(f"📸 Скриншот сохранён: {screenshot_path}")
 
-            elif "is not listed" in page_text:
+            elif "has no issues" in page_text:
                 print(f"✅ {value} чистый")
 
             else:
