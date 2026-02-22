@@ -56,51 +56,53 @@ for i, value in enumerate(values, start=1):
 
     # === Блок капчи ===
     while True:
-        print("🧩 Введи капчу вручную (или подожди, скрипт проверит через 6 сек).")
-        time.sleep(10)
-
         try:
-            # Найти инпут капчи (по name, id или типу — подстрой при необходимости)
+            # Найти инпут капчи
             captcha_inputs = driver.find_elements(By.CSS_SELECTOR, "input[type='text'], input[name*='captcha'], input[id*='captcha']")
             captcha_value = ""
+
+            # Проверяем каждый найденный инпут
             for inp in captcha_inputs:
-                v = inp.get_attribute("value")
-                if v and len(v.strip()) == 6:
-                    captcha_value = v.strip()
+                v = inp.get_attribute("value").strip()
+                if len(v) == 6:
+                    captcha_value = v
                     break
 
             if captcha_value:
-                print(f"🤖 Обнаружен ввод капчи ({captcha_value}) → автоотправка")
+                print(f"🤖 Капча введена ({captcha_value}) → автоотправка")
                 button = driver.find_element(By.CSS_SELECTOR, submit_selector)
                 button.click()
                 print("🚀 Кнопка отправки нажата автоматически")
             else:
-                input("⏸ Капча не заполнена. Введи вручную и нажми Enter → ")
-                button = driver.find_element(By.CSS_SELECTOR, submit_selector)
-                button.click()
-                print("🚀 Кнопка нажата вручную")
+                # Ждём, пока не появится 6 символов
+                print("⏳ Ждём ввода капчи...")
+                time.sleep(1)
+                continue
+
+            time.sleep(3)
+
+            # Проверка на неверный защитный код
+            try:
+                modal = driver.find_element(By.ID, "divMsgModal")
+                modal_text = modal.text.strip().lower()
+                if "неверно указан защитный код" in modal_text:
+                    print("⚠ Неверно введён код. Повторяем ввод капчи.")
+                    try:
+                        close_btn = modal.find_element(By.XPATH, ".//button | .//input[@value='Закрыть']")
+                        close_btn.click()
+                    except:
+                        driver.execute_script("document.getElementById('divMsgModal').style.display='none';")
+                    time.sleep(1)
+                    continue  # Повторяем попытку
+            except:
+                pass
+
+            break  # Всё успешно — выходим из while
 
         except Exception as e:
             print(f"⚠ Ошибка при обработке капчи: {e}")
+            time.sleep(1)
             continue
-
-        time.sleep(3)
-
-        # Проверка на неверный защитный код
-        try:
-            modal = driver.find_element(By.ID, "divMsgModal")
-            modal_text = modal.text.strip().lower()
-            if "неверно указан защитный код" in modal_text:
-                print("⚠ Неверно введён код. Повторите ввод капчи.")
-                try:
-                    close_btn = modal.find_element(By.XPATH, ".//button | .//input[@value='Закрыть']")
-                    close_btn.click()
-                except:
-                    driver.execute_script("document.getElementById('divMsgModal').style.display='none';")
-                time.sleep(1)
-                continue  # Повторяем попытку
-        except:
-            pass
 
         break  # Всё успешно — выходим из while
 

@@ -64,3 +64,4 @@ with SB(uc=True, headless=False, incognito=True) as sb:
         time.sleep(pause_seconds)
 
 print("\n🎯 Проверка завершена.")
+driver.quit()

@@ -19,7 +19,7 @@
         "m.intimstory.guru",
         "b.intimstory.guru",
         "intimcity6.top",
-        "bt.intimcity6.top",
+        "bta.intimcity6.top",
         "intimstory.cfd",
         "btfon.intimstory.cfd",
         "io.intim-city.site",

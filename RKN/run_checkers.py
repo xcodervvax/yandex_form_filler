@@ -22,7 +22,7 @@ def run_script(script_name: str) -> None:
 def main():
     scripts = [
         "sites_auto_checker.py",
-        "check_spamhause.py",
+        "check_spamhaus.py",
         # позже просто добавишь:
         # "script3.py"
     ]
