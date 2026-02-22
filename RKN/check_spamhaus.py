@@ -6,8 +6,8 @@ from seleniumbase import SB
 with open("data.json", "r", encoding="utf-8") as f:
     config = json.load(f)
 
-url = config["spam_hause_url"]
-selector = config["input_spam_hause"]
+url = config["spam_haus_url"]
+selector = config["input_spam_haus"]
 values = config["fields"][0]["values"]
 pause_seconds = config.get("pause_seconds", 5)
 

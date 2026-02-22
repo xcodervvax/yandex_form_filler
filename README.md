@@ -4,7 +4,8 @@
 {
   "url": "https://eais.rkn.gov.ru/",
   "rkn_feedback_url": "https://eais.rkn.gov.ru/feedback/",
-  "spam_hause_url": "https://check.spamhaus.org/",
+  "spam_haus_url": "https://check.spamhaus.org/",
+  "domain_reputation_url": "https://www.spamhaus.org/domain-reputation/",
   "fields": [
     {
       "selector": ".inputMsg",
@@ -29,7 +30,8 @@
     }
   ],
   "submit": "input[type='submit']",
-  "input_spam_hause": "input[data-placeholder*='IP']",
+  "input_spam_haus": "input[data-placeholder*='IP']",
+  "input_dom_rep": "#textfield-295",
   "blocked_text": "орган, принявший решение о внесении в реестр",
   "pause_seconds": 8
 }
