@@ -31,7 +31,7 @@
   ],
   "submit": "input[type='submit']",
   "input_spam_haus": "input[data-placeholder*='IP']",
-  "input_dom_rep": "#textfield-295",
+   "input_dom_rep": "input[maxlength='524288']",
   "blocked_text": "орган, принявший решение о внесении в реестр",
   "pause_seconds": 8
 }

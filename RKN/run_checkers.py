@@ -23,8 +23,7 @@ def main():
     scripts = [
         "sites_auto_checker.py",
         "check_spamhaus.py",
-        # позже просто добавишь:
-        # "script3.py"
+        "check_domain_reputation.py"
     ]
 
     for script in scripts:

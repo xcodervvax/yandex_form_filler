@@ -63,5 +63,4 @@ with SB(uc=True, headless=False, incognito=True) as sb:
         sb.wait_for_ready_state_complete()
         time.sleep(pause_seconds)
 
-print("\n🎯 Проверка завершена.")
-driver.quit()
+    print("\n🎯 Проверка завершена.")
