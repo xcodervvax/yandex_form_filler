@@ -1,102 +1,269 @@
+﻿import argparse
+import json
+from pathlib import Path
+from typing import List, Sequence, Tuple
+
 import torch
 import torch.nn as nn
-from torch.utils.data import DataLoader
+import torch.nn.functional as F
+from torch.nn.utils import clip_grad_norm_
+from torch.utils.data import DataLoader, random_split
+
+from alphabet import char2idx, idx2char
 from dataset import CaptchaDataset
 from model import CRNN
-from alphabet import char2idx, idx2char, BLANK_IDX
+from preprocessing import DEFAULT_CROP_MARGINS, IMG_HEIGHT, IMG_WIDTH, build_captcha_transform
 
-# -------------------------
-# Функции
-# -------------------------
-def encode_labels(labels):
-    targets = []
-    lengths = []
+
+def encode_labels(labels: Sequence[str], label_length: int) -> torch.Tensor:
+    encoded = []
     for text in labels:
-        encoded = [char2idx[c] for c in text]
-        targets.extend(encoded)
-        lengths.append(len(encoded))
-    return torch.tensor(targets, dtype=torch.long), torch.tensor(lengths, dtype=torch.long)
+        if len(text) != label_length:
+            raise ValueError(f"Label length mismatch: expected {label_length}, got {len(text)} for {text!r}")
+        row = []
+        for ch in text:
+            if ch not in char2idx:
+                raise ValueError(f"Unsupported char in label: {ch!r} from {text!r}")
+            row.append(char2idx[ch])
+        encoded.append(row)
+    return torch.tensor(encoded, dtype=torch.long)
 
-def collate_fn(batch):
-    images, labels = zip(*batch)
-    images = torch.stack(images, dim=0)
-    targets, target_lengths = encode_labels(labels)
-    return images, targets, target_lengths, labels
 
-def greedy_decode(log_probs, idx2char, blank=BLANK_IDX):
-    preds = log_probs.argmax(2)  # [T, B]
+def make_collate_fn(label_length: int):
+    def collate_fn(batch):
+        images, labels = zip(*batch)
+        images = torch.stack(images, dim=0)
+        targets = encode_labels(labels, label_length)
+        return images, targets, labels
+
+    return collate_fn
+
+
+def decode_logits(seq_logits: torch.Tensor) -> List[str]:
+    preds = seq_logits.argmax(dim=2)  # [B, L]
     results = []
-    for b in range(preds.size(1)):
-        prev = None
-        chars = []
-        for t in range(preds.size(0)):
-            p = preds[t, b].item()
-            if p != prev and p != blank:
-                chars.append(idx2char[p])
-            prev = p
-        results.append("".join(chars))
+    for row in preds:
+        results.append("".join(idx2char[idx.item()] for idx in row))
     return results
 
-def preprocess_batch(images, device):
-    return torch.stack([img.float() for img in images]).to(device)
 
-# -------------------------
-# Training loop
-# -------------------------
-def main():
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    print("Device:", device)
+def compute_char_accuracy(pred_texts: Sequence[str], gt_texts: Sequence[str]) -> float:
+    correct = 0
+    total = 0
+    for pred, gt in zip(pred_texts, gt_texts):
+        total += len(gt)
+        correct += sum(1 for p, g in zip(pred, gt) if p == g)
+    return (correct / total) if total > 0 else 0.0
 
-    dataset = CaptchaDataset("data/train", "data/train/labels.txt")
-    loader = DataLoader(dataset, batch_size=4, shuffle=True, collate_fn=collate_fn)
 
-    model = CRNN(hidden_size=256).to(device)
-    criterion = nn.CTCLoss(blank=BLANK_IDX, zero_infinity=True)
-    optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
+def run_epoch(
+    model,
+    loader,
+    criterion,
+    optimizer,
+    device,
+    grad_clip,
+    train_mode,
+):
+    model.train(mode=train_mode)
+    total_loss = 0.0
+    all_preds = []
+    all_gt = []
 
-    model.train()
-    num_epochs = 10
+    for images, targets, labels in loader:
+        images = images.float().to(device)
+        targets = targets.to(device)
 
-    for epoch in range(num_epochs):
-        total_loss = 0.0
-        print(f"\n=== Epoch {epoch+1} ===")
+        if train_mode:
+            optimizer.zero_grad(set_to_none=True)
 
-        for batch_idx, (images, targets, target_lengths, labels) in enumerate(loader):
-            images = preprocess_batch(images, device)
-            targets = targets.to(device)
-            target_lengths = target_lengths.to(device)
+        logits_tbc = model(images)  # [T, B, C]
+        seq_logits = logits_tbc.permute(1, 2, 0)  # [B, C, T]
+        seq_logits = F.adaptive_avg_pool1d(seq_logits, output_size=targets.size(1))
+        seq_logits = seq_logits.permute(0, 2, 1).contiguous()  # [B, L, C]
 
-            optimizer.zero_grad()
-            logits = model(images)  # [B, T, C] или [T, B, C]
+        loss = criterion(seq_logits.view(-1, seq_logits.size(-1)), targets.view(-1))
 
-            # Приведение к [T,B,C]
-            if logits.dim() == 3 and logits.shape[0] == images.size(0):
-                logits = logits.permute(1, 0, 2)
-
-            input_lengths = torch.full(
-                size=(images.size(0),), fill_value=logits.size(0), dtype=torch.long
-            ).to(device)
-
-            log_probs = logits.log_softmax(2)
-            loss = criterion(log_probs, targets, input_lengths, target_lengths)
-
+        if train_mode:
             loss.backward()
-
-            # Gradient clipping
-            from torch.nn.utils import clip_grad_norm_
-            clip_grad_norm_(model.parameters(), max_norm=5.0)
-
+            clip_grad_norm_(model.parameters(), max_norm=grad_clip)
             optimizer.step()
-            total_loss += loss.item()
 
-            # --- DEBUG DECODE (первые 2 батча) ---
-            if batch_idx < 2:
-                decoded = greedy_decode(log_probs.detach(), idx2char, BLANK_IDX)
-                print("GT:", labels)
-                print("PR:", decoded)
+        total_loss += loss.item()
+        batch_preds = decode_logits(seq_logits.detach())
+        all_preds.extend(batch_preds)
+        all_gt.extend(labels)
 
-        avg_loss = total_loss / len(loader)
-        print(f"Epoch {epoch+1} average loss: {avg_loss:.4f}")
+    avg_loss = total_loss / max(1, len(loader))
+    seq_acc = sum(p == g for p, g in zip(all_preds, all_gt)) / max(1, len(all_gt))
+    char_acc = compute_char_accuracy(all_preds, all_gt)
+    return avg_loss, seq_acc, char_acc
+
+
+def build_loaders(args):
+    crop_margins = None if args.no_crop else DEFAULT_CROP_MARGINS
+    transform = build_captcha_transform(
+        image_size=(IMG_HEIGHT, IMG_WIDTH),
+        crop_margins=crop_margins,
+        use_denoise=args.use_denoise,
+    )
+    dataset = CaptchaDataset(args.data_dir, args.labels_file, transform=transform)
+
+    if len(dataset) < 2:
+        raise ValueError("Need at least 2 labeled images for train/val split")
+
+    label_lengths = {len(text) for text in dataset.labels.values()}
+    if len(label_lengths) != 1:
+        raise ValueError(f"All labels must have the same length, got lengths: {sorted(label_lengths)}")
+    label_length = next(iter(label_lengths))
+
+    val_size = max(1, int(len(dataset) * args.val_ratio))
+    train_size = len(dataset) - val_size
+    if train_size < 1:
+        train_size = len(dataset) - 1
+        val_size = 1
+
+    split_gen = torch.Generator().manual_seed(args.seed)
+    train_ds, val_ds = random_split(dataset, [train_size, val_size], generator=split_gen)
+
+    collate_fn = make_collate_fn(label_length)
+    train_loader = DataLoader(
+        train_ds,
+        batch_size=args.batch_size,
+        shuffle=True,
+        collate_fn=collate_fn,
+        num_workers=args.num_workers,
+        pin_memory=torch.cuda.is_available(),
+    )
+    val_loader = DataLoader(
+        val_ds,
+        batch_size=args.batch_size,
+        shuffle=False,
+        collate_fn=collate_fn,
+        num_workers=args.num_workers,
+        pin_memory=torch.cuda.is_available(),
+    )
+    return train_loader, val_loader, len(dataset), train_size, val_size, label_length, crop_margins
+
+
+def save_checkpoint(
+    path: Path,
+    model,
+    optimizer,
+    epoch: int,
+    metrics: dict,
+    args,
+    label_length: int,
+    crop_margins,
+):
+    payload = {
+        "model_state": model.state_dict(),
+        "optimizer_state": optimizer.state_dict(),
+        "epoch": epoch,
+        "metrics": metrics,
+        "config": {
+            "hidden_size": args.hidden_size,
+            "img_height": IMG_HEIGHT,
+            "img_width": IMG_WIDTH,
+            "crop_margins": crop_margins,
+            "use_denoise": args.use_denoise,
+            "label_length": label_length,
+        },
+    }
+    torch.save(payload, path)
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(description="Train CRNN for captcha recognition")
+    parser.add_argument("--data-dir", default="data/train")
+    parser.add_argument("--labels-file", default="data/train/labels.txt")
+    parser.add_argument("--output-dir", default="checkpoints")
+    parser.add_argument("--epochs", type=int, default=40)
+    parser.add_argument("--batch-size", type=int, default=16)
+    parser.add_argument("--lr", type=float, default=1e-3)
+    parser.add_argument("--val-ratio", type=float, default=0.15)
+    parser.add_argument("--hidden-size", type=int, default=256)
+    parser.add_argument("--grad-clip", type=float, default=5.0)
+    parser.add_argument("--num-workers", type=int, default=0)
+    parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--use-denoise", action="store_true")
+    parser.add_argument("--no-crop", action="store_true")
+    return parser.parse_args()
+
+
+def main():
+    args = parse_args()
+    torch.manual_seed(args.seed)
+
+    output_dir = Path(args.output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    print(f"Device: {device}")
+
+    train_loader, val_loader, dataset_size, train_size, val_size, label_length, crop_margins = build_loaders(args)
+    print(f"Dataset size: {dataset_size} (train={train_size}, val={val_size})")
+    print(f"Label length: {label_length}")
+
+    model = CRNN(hidden_size=args.hidden_size).to(device)
+    criterion = nn.CrossEntropyLoss()
+    optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
+
+    best_score = (-1.0, -1.0, float("-inf"))
+    history = []
+
+    for epoch in range(1, args.epochs + 1):
+        train_loss, train_seq_acc, train_char_acc = run_epoch(
+            model,
+            train_loader,
+            criterion,
+            optimizer,
+            device,
+            args.grad_clip,
+            train_mode=True,
+        )
+
+        with torch.no_grad():
+            val_loss, val_seq_acc, val_char_acc = run_epoch(
+                model,
+                val_loader,
+                criterion,
+                optimizer,
+                device,
+                args.grad_clip,
+                train_mode=False,
+            )
+
+        metrics = {
+            "train_loss": train_loss,
+            "train_seq_acc": train_seq_acc,
+            "train_char_acc": train_char_acc,
+            "val_loss": val_loss,
+            "val_seq_acc": val_seq_acc,
+            "val_char_acc": val_char_acc,
+        }
+        history.append({"epoch": epoch, **metrics})
+
+        print(
+            f"Epoch {epoch:03d} | "
+            f"train_loss={train_loss:.4f} train_seq_acc={train_seq_acc:.3f} train_char_acc={train_char_acc:.3f} | "
+            f"val_loss={val_loss:.4f} val_seq_acc={val_seq_acc:.3f} val_char_acc={val_char_acc:.3f}"
+        )
+
+        last_path = output_dir / "last.pt"
+        save_checkpoint(last_path, model, optimizer, epoch, metrics, args, label_length, crop_margins)
+
+        score = (val_seq_acc, val_char_acc, -val_loss)
+        if score > best_score:
+            best_score = score
+            best_path = output_dir / "best.pt"
+            save_checkpoint(best_path, model, optimizer, epoch, metrics, args, label_length, crop_margins)
+            print(f"  Saved new best checkpoint: {best_path}")
+
+    history_path = output_dir / "history.json"
+    history_path.write_text(json.dumps(history, indent=2), encoding="utf-8")
+    print(f"Training complete. History saved to: {history_path}")
+
 
 if __name__ == "__main__":
     main()

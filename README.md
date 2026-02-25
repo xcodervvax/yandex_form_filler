@@ -24,7 +24,7 @@
         "intimstory.cfd",
         "btfon.intimstory.cfd",
         "io.intim-city.site",
-        "pr.intimcity.bike",
+        "pr.intimcity.mba",
         "btpr.intimcity6.top"
       ]
     }

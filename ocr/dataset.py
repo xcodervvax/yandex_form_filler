@@ -1,54 +1,63 @@
-from pathlib import Path
-from PIL import Image
-import torch
-from torch.utils.data import Dataset
-import torchvision.transforms as T
-import cv2
-import numpy as np
+﻿from pathlib import Path
+from typing import Dict
 
-def denoise_pil(img):
-    """Удаляем мелкий шум с изображения PIL.Image"""
-    img_np = np.array(img)
-    img_np = cv2.medianBlur(img_np, 3)
-    img_np = cv2.fastNlMeansDenoisingColored(
-        img_np, None, h=10, hColor=10, templateWindowSize=7, searchWindowSize=21
-    )
-    return Image.fromarray(img_np)
+from PIL import Image
+from torch.utils.data import Dataset
+
+from preprocessing import build_captcha_transform
+
 
 class CaptchaDataset(Dataset):
-    def __init__(self, root, labels_file):
+    def __init__(
+        self,
+        root: str,
+        labels_file: str,
+        transform=None,
+        allowed_exts=None,
+    ):
         self.root = Path(root)
+        self.labels_file = Path(labels_file)
+        self.allowed_exts = allowed_exts or {".jpg", ".png", ".jpeg"}
 
-        # --- load labels ---
-        self.labels = {}
-        with open(labels_file, "r") as f:
-            for line in f:
-                name, text = line.strip().split()
-                self.labels[name] = text
+        self.labels: Dict[str, str] = self._load_labels(self.labels_file)
+        self.images = self._collect_images()
+        self.transform = transform or build_captcha_transform()
 
-        # --- keep only images with GT ---
-        self.images = [
-            p for p in self.root.glob("*.*")
-            if p.stem in self.labels and p.suffix.lower() in [".jpg", ".png", ".jpeg"]
+    def _load_labels(self, labels_file: Path) -> Dict[str, str]:
+        labels: Dict[str, str] = {}
+        with labels_file.open("r", encoding="utf-8") as f:
+            for line_num, raw_line in enumerate(f, start=1):
+                line = raw_line.strip()
+                if not line:
+                    continue
+                parts = line.split()
+                if len(parts) != 2:
+                    raise ValueError(
+                        f"Invalid label format in {labels_file}:{line_num}: {raw_line!r}"
+                    )
+                name, text = parts
+                labels[name] = text
+        return labels
+
+    def _collect_images(self):
+        images = [
+            p
+            for p in self.root.glob("*.*")
+            if p.suffix.lower() in self.allowed_exts and p.stem in self.labels
         ]
-
-        # --- transforms ---
-        self.transform = T.Compose([
-            T.Grayscale(),
-            T.Lambda(lambda img: img.crop((25, 16, img.width - 25, img.height - 16))),
-            T.Resize((32, 256)),  # ширина увеличена
-            T.ToTensor(),
-        ])
+        images.sort(key=lambda p: p.name)
+        if not images:
+            raise FileNotFoundError(
+                f"No labeled images found in {self.root} using {self.labels_file}"
+            )
+        return images
 
     def __len__(self):
         return len(self.images)
 
     def __getitem__(self, idx):
         path = self.images[idx]
-
         img = Image.open(path).convert("RGB")
-        img = denoise_pil(img)
         img = self.transform(img)
-
         label = self.labels[path.stem]
         return img, label

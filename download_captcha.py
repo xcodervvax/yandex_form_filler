@@ -33,9 +33,13 @@ for i in range(100):
     # Получаем ссылку на изображение
     src = captcha_img.get_attribute("src")
 
+    # Разделяем по '?', берем часть после
+    hash = src.split("show/?")[-1]
+
     response = requests.get(src)
 
-    filename = f"images/img_{RUN_TIME}_{i+1:03d}.jpg"
+    # filename = f"images/img_{RUN_TIME}_{i+1:03d}.jpg"
+    filename = f"images/{hash}.jpg"
     with open(filename, "wb") as f:
         f.write(response.content)
 
