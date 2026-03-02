@@ -21,6 +21,7 @@ def run_script(script_name: str) -> None:
 
 def main():
     scripts = [
+        # "sites_auto_checker.py",
         "sites_auto_checker_SB.py",
         "check_spamhaus.py",
         "check_domain_reputation.py"

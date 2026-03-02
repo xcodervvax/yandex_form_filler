@@ -1,3 +1,15 @@
+В корне проекта создаём директорию .vscode -> settings.json
+```json
+{
+  "workbench.colorCustomizations": {
+    "titleBar.activeForeground": "#000",
+    "titleBar.inactiveForeground": "#000000CC",
+    "titleBar.activeBackground": "#ffa600",
+    "titleBar.inactiveBackground": "#ffa600"
+  }
+}
+```
+
 В проекте создаем [text](data.json)
 
 ```json
@@ -12,13 +24,13 @@
       "values": [
         "intimcity.mba",
         "m.intimcity.mba",
-        "b.intimcity.mba",
-        "intimcity.cyou",
-        "m.intimcity.cyou",
-        "a.intimcity.cyou",
+        "d.intimcity.mba",
+        "intimcity.online",
+        "m.intimcity.online",
+        "a.intimcity.online",
         "intimstory.guru",
         "m.intimstory.guru",
-        "b.intimstory.guru",
+        "a.intimstory.guru",
         "intimcity6.top",
         "bta.intimcity6.top",
         "intimstory.cfd",

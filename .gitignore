@@ -2,7 +2,7 @@ venv/*
 
 announcement.json
 process.log
-
+.vscode/*
 data.json
 
 images/*
