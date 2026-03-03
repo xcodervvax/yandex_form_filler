@@ -31,7 +31,8 @@ options.add_argument("--disable-quic")
 options.add_argument("--disable-ipv6")
 options.add_argument("--remote-debugging-port=9222")
 
-driver = webdriver.Chrome(service=Service(ChromeDriverManager(driver_version="120.0.6099.109").install()), options=options)
+service = Service('../chromedriver_120')
+driver = webdriver.Chrome(service=service, options=options)
 wait = WebDriverWait(driver, 20)
 
 print(f"🌐 Загружаю сайт: {url}")

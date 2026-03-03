@@ -1,3 +1,4 @@
 -r base.in
 selenium
 seleniumbase
+webdriver_manager
