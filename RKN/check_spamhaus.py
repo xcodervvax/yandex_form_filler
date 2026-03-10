@@ -37,7 +37,7 @@ with SB(uc=True, headless=False, incognito=True) as sb:
             sb.wait_for_ready_state_complete()
             time.sleep(2)
 
-            page_text = sb.get_text("body").lower()
+            page_text = sb.get_text("h2.text-brand-blue-5").lower()
 
             # === Проверка статуса ===
             if " listing" in page_text:

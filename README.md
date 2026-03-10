@@ -22,22 +22,22 @@
     {
       "selector": ".inputMsg",
       "values": [
-        "intimcity.mba",
-        "m.intimcity.mba",
-        "d.intimcity.mba",
-        "intimcity.online",
-        "m.intimcity.online",
-        "a.intimcity.online",
-        "intimstory.guru",
-        "m.intimstory.guru",
-        "b.intimstory.guru",
-        "intimcity6.top",
-        "btb.intimcity6.top",
+        "intimcity.mobi",
+        "m.intimcity.mobi",
+        "a.intimcity.mobi",
+        "intimcity.center",
+        "m.intimcity.center",
+        "a.intimcity.center",
+        "intimstory.icu",
+        "m.intimstory.icu",
+        "b.intimstory.icu",
+        "intimcity8.top",
+        "bt.intimcity8.top",
         "intimstory.cfd",
         "btfon.intimstory.cfd",
         "io.intim-city.site",
-        "pr.intimcity.mba",
-        "btpr.intimcity6.top"
+        "pr.intimcity.mobi",
+        "btpr.intimcity8.top"
       ]
     }
   ],
