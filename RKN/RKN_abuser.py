@@ -17,6 +17,27 @@ from selenium.common.exceptions import (
     StaleElementReferenceException,
 )
 
+# === Проверка папки images ===
+def check_images_folder():
+    images_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "images")
+
+    if not os.path.exists(images_dir):
+        print("❌ Папка images не существует:", images_dir)
+        sys.exit(1)
+
+    files = [
+        f for f in os.listdir(images_dir)
+        if os.path.isfile(os.path.join(images_dir, f))
+    ]
+
+    if len(files) == 0:
+        print("❌ Папка images пустая. Добавьте изображения перед запуском.")
+        sys.exit(1)
+
+    print(f"📁 Найдено изображений в images: {len(files)}")
+
+check_images_folder()
+
 # === 0. Запуск create_RKN_json.py ===
 current_dir = os.path.dirname(os.path.abspath(__file__))
 script_path = os.path.join(current_dir, "create_RKN_json.py")

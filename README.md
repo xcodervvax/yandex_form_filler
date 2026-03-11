@@ -34,7 +34,7 @@
         "intimcity8.top",
         "bt.intimcity8.top",
         "intimstory.cfd",
-        "btfon.intimstory.cfd",
+        "btg.intimstory.cfd",
         "io.intim-city.site",
         "pr.intimcity.mobi",
         "btpr.intimcity8.top"
