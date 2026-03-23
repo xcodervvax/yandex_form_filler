@@ -10,7 +10,7 @@ with open("data.json", "r", encoding="utf-8") as f:
 url = config["domain_reputation_url"]
 selector = config["input_dom_rep"]
 values = config["fields"][0]["values"]
-pause_seconds = config.get("pause_seconds", 5)
+pause_seconds = config.get("pause_seconds", 8)
 
 # Индексы, которые нужно проверять (0, 3, 6)
 check_indices = [0, 3, 6]

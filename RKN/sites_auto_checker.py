@@ -78,7 +78,7 @@ for i, value in enumerate(values, start=1):
             else:
                 # Ждём, пока не появится 6 символов
                 print("⏳ Ждём ввода капчи...")
-                time.sleep(1)
+                time.sleep(2)
                 continue
 
             time.sleep(3)
@@ -103,13 +103,13 @@ for i, value in enumerate(values, start=1):
 
         except Exception as e:
             print(f"⚠ Ошибка при обработке капчи: {e}")
-            time.sleep(1)
+            time.sleep(2)
             continue
 
         break  # Всё успешно — выходим из while
 
     # Небольшая задержка для загрузки результатов
-    time.sleep(5)
+    time.sleep(10)
 
     # Проверка на блокировку ресурса
     wait = WebDriverWait(driver, 20)
@@ -145,7 +145,7 @@ for i, value in enumerate(values, start=1):
         try:
             driver.get(check_value)
             wait.until(EC.presence_of_element_located((By.TAG_NAME, "body")))
-            time.sleep(6)
+            time.sleep(10)
             page_text = driver.page_source.lower()
 
             # Список типичных ошибок

@@ -10,7 +10,7 @@
 }
 ```
 
-В проекте создаем [text](data.json)
+В проекте создаем директорию RKN  и в ней создаём файлы [text](data.json)
 
 ```json
 {
@@ -22,22 +22,22 @@
     {
       "selector": ".inputMsg",
       "values": [
-        "intimcity.mobi",
-        "m.intimcity.mobi",
-        "a.intimcity.mobi",
+        "intimcity.pink",
+        "m.intimcity.pink",
+        "a.intimcity.pink",
         "intimcity.center",
         "m.intimcity.center",
         "a.intimcity.center",
         "intimstory.icu",
         "m.intimstory.icu",
-        "b.intimstory.icu",
-        "intimcity8.top",
-        "bt.intimcity8.top",
+        "a.intimstory.icu",
+        "intimcity11.top",
+        "bt.intimcity11.top",
         "intimstory.cfd",
         "btg.intimstory.cfd",
         "io.intim-city.site",
-        "pr.intimcity.mobi",
-        "btpr.intimcity8.top"
+        "pr.intimcity.pink",
+        "btpr.intimcity11.top"
       ]
     }
   ],
@@ -63,6 +63,29 @@
   "days_range": ["Сегодня", "Вчера"],
   "pause_seconds": 30
 }
+```
+
+и [text](RKN_data.txt)
+
+```txt
+link: https://mns.prostitytky-mos.com
+image:
+info: Здравствуйте, просьба проверить и принять меры по ограничению доступа к сайту *.prostitytky-mos.com который пропагандирует не традиционные сексуальные отношения. Страница https://mns.prostitytky-mos.com . Для обхода блокировки сайт просто меняет поддомены, поэтому необходимо заблокировать именно корневой домен.
+
+Так как сайт неоднократно менял адрес и был заблокирован
+3807055-URL-on от 16.03.2026
+Роскомнадзор
+доступ ограничивается к сайту
+=
+surname: Салтыкова
+first_name: Вера
+patronimic: Арнольдовна
+born_year: 1984
+work_place: Фортуна
+country: Россия
+region: Дубна
+email: maxcollinz25@gmail.com
+---
 ```
 
 Для создания виртуального окружения:

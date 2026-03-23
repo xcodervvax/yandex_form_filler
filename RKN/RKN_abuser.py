@@ -89,8 +89,6 @@ print("Страница загружена")
 
 # === 3. Цикл по ссылкам ===
 for i, value in enumerate(values, start=1):
-    # print(f"\n🔹 Проверяю ссылку {i}/{len(values)}: {value}")
-
     # type
     try:
         sex = wait.until(
@@ -372,6 +370,8 @@ for i, value in enumerate(values, start=1):
 
     # Небольшая задержка для загрузки результатов
     time.sleep(2)
+
+    print(f"\n🔹 Письмо по ссылке {i} отправлено!")
 
     # Возврат на главную страницу
     driver.get(url)
