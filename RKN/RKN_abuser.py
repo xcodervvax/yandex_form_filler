@@ -5,6 +5,7 @@ import sys
 import os
 import unicodedata
 import random
+import contextlib
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -377,4 +378,8 @@ for i, value in enumerate(values, start=1):
     driver.get(url)
 
 print("\n🎯 Скрипт отработал успешно.")
+
+with contextlib.suppress(FileNotFoundError):
+    os.remove('RKN.json')
+
 driver.quit()

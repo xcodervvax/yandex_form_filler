@@ -22,22 +22,22 @@
     {
       "selector": ".inputMsg",
       "values": [
-        "intimcity.pink",
-        "m.intimcity.pink",
-        "a.intimcity.pink",
+        "intimcity.promo",
+        "m.intimcity.promo",
+        "a.intimcity.promo",
         "intimcity.center",
         "m.intimcity.center",
         "a.intimcity.center",
         "intimstory.icu",
         "m.intimstory.icu",
-        "a.intimstory.icu",
-        "intimcity11.top",
-        "bt.intimcity11.top",
+        "b.intimstory.icu",
+        "intimcity12.top",
+        "bt.intimcity12.top",
         "intimstory.cfd",
         "btg.intimstory.cfd",
         "io.intim-city.site",
-        "pr.intimcity.pink",
-        "btpr.intimcity11.top"
+        "pr.intimcity.promo",
+        "btpr.intimcity12.top"
       ]
     }
   ],
