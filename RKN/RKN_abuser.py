@@ -37,7 +37,9 @@ def check_images_folder():
 
     print(f"📁 Найдено изображений в images: {len(files)}")
 
-check_images_folder()
+    return len(files)
+
+files_count = check_images_folder()
 
 # === 0. Запуск create_RKN_json.py ===
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -289,7 +291,7 @@ for i, value in enumerate(values, start=1):
         send_notification_cb.click()
 
     # === Блок капчи ===
-    for attempt in range(1, 4):
+    for attempt in range(1, files_count+1):
         print(f"\n🔁 Попытка {attempt}/3")
 
         try:
