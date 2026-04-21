@@ -54,15 +54,23 @@ if result.returncode != 0:
 
 print("create_RKN_json.py успешно выполнен")
 
+# путь к директории текущего скрипта
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# абсолютный путь к data.json
+config_path = os.path.join(BASE_DIR, "data.json")
+# абсолютный путь к RKN.json
+rkn_path = os.path.join(BASE_DIR, "RKN.json")
+
 # === 1. Загрузка конфигурации  data.json ===
-with open("data.json", "r", encoding="utf-8") as f:
+with open(config_path, "r", encoding="utf-8") as f:
     config = json.load(f)
 
 url = config["rkn_feedback_url"]
 submit_selector = config["submit"]
 
 # === 1a. Загрузка конфигурации  RKN.json ===
-with open("RKN.json", "r", encoding="utf-8") as f:
+with open(rkn_path, "r", encoding="utf-8") as f:
     values = json.load(f)
 
 pause_seconds = config.get("pause_seconds", 15)
@@ -79,7 +87,12 @@ options.add_argument("--disable-ipv6")
 options.add_argument("--remote-debugging-port=9222")
 options.add_experimental_option("detach", True)
 
-service = Service('../chromedriver')
+# подняться на 1 уровень выше
+project_root = os.path.dirname(BASE_DIR)
+
+chromedriver_path = os.path.join(project_root, 'chromedriver')
+
+service = Service(chromedriver_path)
 driver = webdriver.Chrome(service=service, options=options)
 wait = WebDriverWait(driver, 20)
 

@@ -1,11 +1,18 @@
+import os
 import subprocess
 import sys
 
 def run_script(script_name: str) -> None:
     print(f"Запуск {script_name}...")
+
+    # путь к текущему файлу
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+
+    # абсолютный путь к скрипту
+    script_path = os.path.join(base_dir, script_name)
     
     result = subprocess.run(
-        [sys.executable, script_name],
+        [sys.executable, script_path],
         capture_output=True,
         text=True
     )

@@ -1,10 +1,17 @@
 import json
-import time
+import os
 from seleniumbase import SB
 from selenium.webdriver.common.by import By
+import time
+
+# путь к директории текущего скрипта
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# абсолютный путь к data.json
+config_path = os.path.join(BASE_DIR, "data.json")
 
 # === 1. Загрузка конфигурации ===
-with open("data.json", "r", encoding="utf-8") as f:
+with open(config_path, "r", encoding="utf-8") as f:
     config = json.load(f)
 
 url = config["domain_reputation_url"]
@@ -16,6 +23,10 @@ pause_seconds = config.get("pause_seconds", 8)
 check_indices = [0, 3, 6]
 
 print(f"🌐 Проверка через Domain Reputation: {url}")
+
+# папка для скринов
+screens_dir = os.path.join(BASE_DIR, "screens")
+os.makedirs(screens_dir, exist_ok=True)
 
 with SB(uc=True, headless=False, incognito=True) as sb:
     sb.open(url)
@@ -54,14 +65,20 @@ with SB(uc=True, headless=False, incognito=True) as sb:
             if reputation_score is not None:
                 print(f"📊 Reputation score: {reputation_score}")
                 if reputation_score < 0:
-                    screenshot_path = f"screens/bad_{i}_{int(time.time())}.png"
+                    screenshot_path = os.path.join(
+                        screens_dir,
+                        f"bad_{i}_{int(time.time())}.png"
+                    )
                     sb.save_screenshot(screenshot_path)
                     print(f"❌ Репутация отрицательная, скриншот сохранён: {screenshot_path}")
                 else:
                     print(f"✅ Репутация положительная")
             else:
                 print(f"⚠ Не удалось определить числовое значение репутации")
-                screenshot_path = f"screens/unknown_{i}_{int(time.time())}.png"
+                screenshot_path = os.path.join(
+                    screens_dir,
+                    f"unknown_{i}_{int(time.time())}.png"
+                )
                 sb.save_screenshot(screenshot_path)
 
         except Exception as e:

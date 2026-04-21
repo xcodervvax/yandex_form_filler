@@ -1,5 +1,5 @@
 import json
-import time
+import os
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -7,9 +7,16 @@ from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
+import time
+
+# путь к директории текущего скрипта
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# абсолютный путь к data.json
+config_path = os.path.join(BASE_DIR, "data.json")
 
 # === 1. Загрузка конфигурации ===
-with open("data.json", "r", encoding="utf-8") as f:
+with open(config_path, "r", encoding="utf-8") as f:
     config = json.load(f)
 
 url = config["url"]
@@ -31,7 +38,12 @@ options.add_argument("--disable-quic")
 options.add_argument("--disable-ipv6")
 options.add_argument("--remote-debugging-port=9222")
 
-service = Service('../chromedriver_120')
+# подняться на 1 уровень выше
+project_root = os.path.dirname(BASE_DIR)
+
+chromedriver_path = os.path.join(project_root, 'chromedriver_120')
+
+service = Service(chromedriver_path)
 driver = webdriver.Chrome(service=service, options=options)
 wait = WebDriverWait(driver, 20)
 
@@ -115,16 +127,26 @@ for i, value in enumerate(values, start=1):
     wait = WebDriverWait(driver, 20)
     page_source = driver.page_source.lower()
 
+    # папка для скринов
+    screens_dir = os.path.join(BASE_DIR, "screens")
+    os.makedirs(screens_dir, exist_ok=True)
+
     if blocked_text.lower() in page_source:
         try:
             # Найти элемент с текстом блокировки
             element = driver.find_element(By.XPATH, f"//*[contains(translate(., 'ОРГАНПРИНЯВШИЙРЕШЕНИЕОВНЕСЕНИИ', 'органпринявшийрешениеовнесении'), '{blocked_text.lower()}')]")
-            screenshot_path = f"screens/blocked_{i}_{int(time.time())}.png"
+            screenshot_path = os.path.join(
+                screens_dir,
+                f"blocked_{i}_{int(time.time())}.png"
+            )
             element.screenshot(screenshot_path)
             print(f"📸 Сохранён фрагмент страницы: {screenshot_path}")
         except Exception as e:
             print(f"⚠ Не удалось сделать скриншот блока: {e}")
-            fallback_path = f"blocked_full_{i}_{int(time.time())}.png"
+            fallback_path = os.path.join(
+                screens_dir,
+                f"blocked_full_{i}_{int(time.time())}.png"
+            )
             driver.save_screenshot(fallback_path)
 
             print(f"📸 Сохранён полный скриншот: {fallback_path}")
@@ -165,7 +187,10 @@ for i, value in enumerate(values, start=1):
             if any(err in page_text for err in error_signatures):
                 print(f"❌ Сайт {check_value} недоступен или вернул ошибку.")
                 # Сохраняем скриншот для отчёта
-                screenshot_path = f"screens/unavailable_{i}_{int(time.time())}.png"
+                screenshot_path = os.path.join(
+                    screens_dir,
+                    f"unavailable_{i}_{int(time.time())}.png"
+                )
                 driver.save_screenshot(screenshot_path)
                 print(f"📸 Скриншот сохранён: {screenshot_path}")
             else:

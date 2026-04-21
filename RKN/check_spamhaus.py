@@ -1,9 +1,16 @@
 import json
-import time
+import os
 from seleniumbase import SB
+import time
+
+# путь к директории текущего скрипта
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# абсолютный путь к data.json
+config_path = os.path.join(BASE_DIR, "data.json")
 
 # === 1. Загрузка конфигурации ===
-with open("data.json", "r", encoding="utf-8") as f:
+with open(config_path, "r", encoding="utf-8") as f:
     config = json.load(f)
 
 url = config["spam_haus_url"]
@@ -12,6 +19,10 @@ values = config["fields"][0]["values"]
 pause_seconds = config.get("pause_seconds", 5)
 
 print(f"🌐 Проверка через Spamhaus: {url}")
+
+# папка для скринов
+screens_dir = os.path.join(BASE_DIR, "screens")
+os.makedirs(screens_dir, exist_ok=True)
 
 with SB(uc=True, headless=False, incognito=True) as sb:
     sb.open(url)
@@ -42,8 +53,10 @@ with SB(uc=True, headless=False, incognito=True) as sb:
             # === Проверка статуса ===
             if " listing" in page_text:
                 print(f"❌ {value} В СПИСКЕ Spamhaus")
-
-                screenshot_path = f"screens/listed_{i}_{int(time.time())}.png"
+                screenshot_path = os.path.join(
+                    screens_dir,
+                    f"listed_{i}_{int(time.time())}.png"
+                )
                 sb.save_screenshot(screenshot_path)
                 print(f"📸 Скриншот сохранён: {screenshot_path}")
 
@@ -52,7 +65,10 @@ with SB(uc=True, headless=False, incognito=True) as sb:
 
             else:
                 print("⚠ Не удалось определить статус")
-                screenshot_path = f"screens/unknown_{i}_{int(time.time())}.png"
+                screenshot_path = os.path.join(
+                    screens_dir,
+                    f"unknown_{i}_{int(time.time())}.png"
+                )
                 sb.save_screenshot(screenshot_path)
 
         except Exception as e:

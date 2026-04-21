@@ -22,22 +22,22 @@
     {
       "selector": ".inputMsg",
       "values": [
-        "intimcity.team",
-        "m.intimcity.team",
-        "a.intimcity.team",
+        "intimcity.media",
+        "m.intimcity.media",
+        "a.intimcity.media",
         "intimcity.center",
         "m.intimcity.center",
         "b.intimcity.center",
-        "intimstory.icu",
-        "m.intimstory.icu",
-        "c.intimstory.icu",
-        "intimcity13.top",
-        "bt.intimcity13.top",
-        "intimstory.cfd",
-        "bth.intimstory.cfd",
+        "intimstory.mom",
+        "m.intimstory.mom",
+        "a.intimstory.mom",
+        "intimcity17.top",
+        "bt.intimcity17.top",
+        "intimstory3.top",
+        "bt.intimstory3.top",
         "io.intim-city.site",
-        "pr.intimcity.team",
-        "btpr.intimcity13.top"
+        "pr.intimcity.media",
+        "btpr.intimcity17.top"
       ]
     }
   ],
@@ -144,3 +144,11 @@ https://sites.google.com/chromium.org/driver/downloads?authuser=0
 имени файла и его значения, то есть GT (Ground Truth) - Правильный, эталонный текст,
 который должен быть на изображении. На выходе получаем PR (Prediction) - Текст,
 который предсказала модель OCR
+
+Для того, чтобы запускать файлы из директории RKN из корня проекта,
+в ней нужно добавить файл __init__.py Можно сотавить пустым.
+После этого, файлы можно запускать из корня следующей командой
+
+```bash
+python3 -m RKN.run_checkers
+```

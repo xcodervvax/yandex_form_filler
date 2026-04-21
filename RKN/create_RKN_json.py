@@ -3,6 +3,14 @@ import re
 import os
 from urllib.parse import urlparse
 
+# путь к директории текущего скрипта
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# абсолютный путь к RKN.json
+rkn_path = os.path.join(BASE_DIR, "RKN.json")
+# абсолютный путь к RKN_data.txt
+rkn_data_path = os.path.join(BASE_DIR, "RKN_data.txt")
+
 def find_image_by_domain(images_dir: str, domain: str) -> str:
     for filename in os.listdir(images_dir):
         name, ext = os.path.splitext(filename)
@@ -71,8 +79,8 @@ def parse_file(input_filename, images_dir='images'):
         records.append(record)
 
     # Записываем в JSON
-    with open('RKN.json', 'w', encoding='utf-8') as outfile:
+    with open(rkn_path, 'w', encoding='utf-8') as outfile:
         json.dump(records, outfile, ensure_ascii=False, indent=4)
 
 # Вызов функции
-parse_file('RKN_data.txt')
+parse_file(rkn_data_path)
