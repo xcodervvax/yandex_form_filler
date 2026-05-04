@@ -38,6 +38,8 @@ fasteners==0.20
     # via seleniumbase
 filelock==3.24.2
     # via seleniumbase
+greenlet==3.4.0
+    # via playwright
 h11==0.16.0
     # via
     #   seleniumbase
@@ -100,12 +102,16 @@ pdbp==1.8.2
     # via seleniumbase
 platformdirs==4.9.2
     # via seleniumbase
+playwright==1.58.0
+    # via -r requirements/api.in
 pluggy==1.6.0
     # via
     #   pytest
     #   seleniumbase
 pyautogui==0.9.54
     # via seleniumbase
+pyee==13.0.1
+    # via playwright
 pygetwindow==0.0.9
     # via pyautogui
 pygments==2.19.2
@@ -210,6 +216,7 @@ typing-extensions==4.15.0
     # via
     #   beautifulsoup4
     #   exceptiongroup
+    #   pyee
     #   selenium
     #   seleniumbase
 urllib3[socks]==2.6.2

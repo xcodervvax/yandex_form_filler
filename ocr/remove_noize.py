@@ -8,6 +8,7 @@ DATA_DIR = "data/train/"
 
 # Получаем список всех изображений
 files = [f for f in os.listdir(DATA_DIR) if f.lower().endswith((".png", ".jpg", ".jpeg"))]
+
 if not files:
     raise FileNotFoundError(f"В папке {DATA_DIR} нет изображений.")
 
